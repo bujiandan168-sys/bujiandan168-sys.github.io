@@ -1,0 +1,41 @@
+{
+  "skill_name": "x-thread-en2cn",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "把这条推编译成即刻长帖：@levelsio: \"I've launched 70+ projects. 4 made money. The lesson: ship fast, charge from day one, and build in public. Most of my revenue comes from just 2 products.\" 链接 https://x.com/levelsio/status/123",
+      "expected_output": "即刻长帖：重写的中文钩子、要点、编者观点（与原作者区分）、互动问题、完整出处声明；不整段直译。",
+      "files": [],
+      "assertions": [
+        "出处声明包含 @levelsio 和原帖链接 https://x.com/levelsio/status/123",
+        "包含标为编者观点的内容（如「我的看法」「放到国内」）",
+        "原帖数字 70+、4、2 未被篡改",
+        "开头不是对 \"I've launched 70+ projects\" 的逐字直译",
+        "包含增量说明，列出原帖没有的新增内容"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我把下面这个英文 thread 改成 X 上的中文串发出去（我粘贴 8 条英文推文）：1/ Most startups don't die from competition... 2/ ... （共 8 条，关于创业公司现金流管理）",
+      "expected_output": "X 中文串：每条以 N/ 编号，每条加权字符 ≤280，首条注明编译来源，倒数第二条为编者观点，最后一条含互动与原链接（缺失则请用户提供 handle/链接）。",
+      "files": [],
+      "assertions": [
+        "每条以「1/」「2/」等编号开头",
+        "每条按 X 加权规则（汉字计 2、链接计 23）不超过 280",
+        "首条注明「编译自 @…」或请用户补充原作者 handle",
+        "有一条明确的编者观点/本土化建议",
+        "没有编造原帖中不存在的论据"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这个链接 https://x.com/someone/status/987 帮我翻成中文发微博",
+      "expected_output": "若无法打开链接，请用户粘贴原文与作者信息，而不是猜测内容生成译文。",
+      "files": [],
+      "assertions": [
+        "在无法读取链接内容时，请用户粘贴原文",
+        "没有凭空编造该推文的内容或作者观点"
+      ]
+    }
+  ]
+}

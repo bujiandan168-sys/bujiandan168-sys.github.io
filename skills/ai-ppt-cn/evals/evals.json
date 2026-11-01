@@ -1,0 +1,45 @@
+{
+  "skill_name": "ai-ppt-cn",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "把下面会议纪要做成 10 分钟的部门周会汇报 PPT，输出 Marp，直接给完整稿：本周上线了会员小程序，注册 1,240 人；退款率从 3.1% 降到 2.4%；客服响应时长还是 12 分钟，目标 5 分钟；下周要招 2 个客服，需要预算 1.6 万。",
+      "expected_output": "主线一句话 + 大纲表 + 完整 Marp Markdown（front matter 含 marp: true，每页讲稿注释）+ 导出命令与 PPTX 可编辑性说明。",
+      "files": [],
+      "assertions": [
+        "Marp 源文件 front matter 中包含 marp: true",
+        "页数在 5–12 页之间（10 分钟）",
+        "每一页都包含讲稿注释 <!-- ... -->（非指令注释）",
+        "每页要点不超过 3 条",
+        "页面标题为结论句（例如包含数字或判断），而非「本周进展」这类主题词",
+        "准确使用 1,240、3.1%→2.4%、12 分钟/5 分钟、1.6 万等数据",
+        "说明默认 --pptx 导出为图片不可编辑，并提及 --pptx-editable 的限制"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我做一个融资路演 deck 的大纲，我们是做 AI 宠物健康监测项圈的，种子轮想融 300 万",
+      "expected_output": "按商业路演结构给出大纲表（标题为结论句），缺失数据标【待补充】；先交大纲而非完整 Marp。",
+      "files": [],
+      "assertions": [
+        "大纲覆盖痛点、方案、市场规模、商业模式、竞争、团队、融资用途",
+        "融资金额 300 万出现在融资用途相关页",
+        "未编造市场规模、用户数等数据，以【待补充】标出",
+        "交付的是大纲表，并请用户确认后再出完整稿"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need slides in Chinese for a 20-min training for new baristas on espresso basics. Give me the full Marp file please, I'll export to PDF. Images are on my laptop.",
+      "expected_output": "中文培训课件完整 Marp 文件，按培训课件结构；导出说明包含 --pdf 与 --allow-local-files。",
+      "files": [],
+      "assertions": [
+        "幻灯片内容为简体中文",
+        "结构包含学习目标、知识点与练习/测验",
+        "导出说明包含 --pdf 命令",
+        "因使用本地图片，导出说明包含 --allow-local-files",
+        "每页都有讲稿注释"
+      ]
+    }
+  ]
+}

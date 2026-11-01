@@ -9,3 +9,13 @@
 
 出品：Skill 实战实验室 · https://noiz.bio/skills
 
+## 免费中文 Skill 包（MIT）
+
+6 个中文内容创作 Skill：小红书、抖音口播、公众号、中文 GEO、中文 PPT、X 热帖编译。详见 [skills/](skills/README.md)。
+
+```bash
+npx skills add bujiandan168-sys/bujiandan168-sys.github.io
+```
+
+许可证：MIT
+
