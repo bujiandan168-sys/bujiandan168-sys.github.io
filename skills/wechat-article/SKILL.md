@@ -149,3 +149,10 @@ python3 scripts/check_copy.py --platform wechat --title "<推荐标题>" --diges
 - [references/layout.md](references/layout.md)：用户要排版参数或要粘贴到 135/秀米/壹伴时读。
 - [references/example-fitness-case.md](references/example-fitness-case.md)：写案例复盘类、想对齐大纲颗粒度时读。
 - [references/ad-compliance-cn.md](references/ad-compliance-cn.md)：涉及推销、价格、功效、数据时读。
+
+## 去 AI 味自检（交稿前过一遍）
+
+- 删掉「首先/其次/综上所述/值得注意的是/赋能/打造」等套话，换成具体事实、数字或场景。
+- 句长要有长有短，不要每段都三点并列、每句都对仗。
+- 至少保留一处只有真人才会说的细节（亲身经历、具体价格、踩过的坑）。
+- 没有依据的数据和夸张形容词一律删掉或标「待核实」。

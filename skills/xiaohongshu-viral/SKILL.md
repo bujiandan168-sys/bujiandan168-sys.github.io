@@ -135,3 +135,10 @@ python3 scripts/check_copy.py --platform xhs --title "<推荐标题>" --body-fil
 - [references/title-formulas.md](references/title-formulas.md)：用户要更多标题或选题方向、或你写出的标题不够抓人时读。
 - [references/examples.md](references/examples.md)：第一次写某个品类（门店、知识、好物、经历、品牌号）不确定风格时读对应示例。
 - [references/ad-compliance-cn.md](references/ad-compliance-cn.md)：稿件涉及商品/服务推销、价格、功效、数据引用时读。
+
+## 去 AI 味自检（交稿前过一遍）
+
+- 删掉「首先/其次/综上所述/值得注意的是/赋能/打造」等套话，换成具体事实、数字或场景。
+- 句长要有长有短，不要每段都三点并列、每句都对仗。
+- 至少保留一处只有真人才会说的细节（亲身经历、具体价格、踩过的坑）。
+- 没有依据的数据和夸张形容词一律删掉或标「待核实」。

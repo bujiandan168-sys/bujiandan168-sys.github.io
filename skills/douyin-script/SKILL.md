@@ -135,3 +135,10 @@ python3 scripts/check_copy.py --platform douyin --body-file <口播全文> --sec
 - [references/example-laundry-45s.md](references/example-laundry-45s.md)：第一次写门店宣传类、想对齐完整交付格式时读。
 - [assets/storyboard-template.md](assets/storyboard-template.md)：写分镜表时使用。
 - [references/ad-compliance-cn.md](references/ad-compliance-cn.md)：涉及推销、价格、功效、数据时读。
+
+## 去 AI 味自检（交稿前过一遍）
+
+- 删掉「首先/其次/综上所述/值得注意的是/赋能/打造」等套话，换成具体事实、数字或场景。
+- 句长要有长有短，不要每段都三点并列、每句都对仗。
+- 至少保留一处只有真人才会说的细节（亲身经历、具体价格、踩过的坑）。
+- 没有依据的数据和夸张形容词一律删掉或标「待核实」。
