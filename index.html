@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="免费在线 SKILL.md 检测与生成工具：按 Agent Skills 开放标准检查 name、description 等字段，扫描 curl|bash、硬编码密钥、提示注入等安全风险，并一键生成中文 Skill。纯浏览器本地运行，内容不上传。" />
+    <meta name="keywords" content="SKILL.md,Skill检测,Skill生成器,Claude Skills,Agent Skills,Skill安全,技能检测,中文Skill" />
+    <meta property="og:title" content="Skill 体检 · 中文 SKILL.md 检测与生成器" />
+    <meta property="og:description" content="粘贴 SKILL.md，10 秒出合规与安全体检报告。" />
+    <link rel="canonical" href="https://bujiandan168-sys.github.io/" />
+    <title>Skill 体检 · 中文 SKILL.md 检测与生成器</title>
+    <link rel="stylesheet" href="hark.css" />
+    <link rel="stylesheet" href="hark-hero.css" />
+    <style>
+      .x-panel { display: grid; gap: 16px; padding: 22px 24px; border-radius: var(--r-m); background: var(--fill-tertiary); min-width: 0; }
+      .x-field { display: grid; gap: 6px; min-width: 0; }
+      .x-field > label { font: var(--type-label); }
+      .x-hint { font: var(--type-caption); color: var(--text-secondary); }
+      .x-hint.is-bad { color: var(--fill-system-red); }
+      .x-hint.is-good { color: var(--text-primary); }
+      .x-input, .x-area, .x-select {
+        width: 100%;
+        min-height: var(--tap);
+        padding: 10px 12px;
+        border: 1px solid var(--stroke-primary);
+        border-radius: var(--r-s);
+        background: var(--fill-primary-on);
+        color: var(--text-primary);
+        font: var(--type-body);
+      }
+      .x-area { resize: vertical; min-height: 96px; }
+      .x-mono { font: var(--weight-regular) var(--size-small)/1.5 "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .x-area--big { min-height: 300px; }
+      .x-area--out { min-height: 520px; }
+      .x-input:focus-visible, .x-area:focus-visible, .x-select:focus-visible { outline: 2px solid var(--fill-primary); outline-offset: 1px; }
+      .x-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      @media (max-width: 760px) { .x-two { grid-template-columns: minmax(0, 1fr); } }
+      .x-msg { font: var(--type-small); color: var(--text-secondary); min-height: 1.3em; }
+      .x-report { display: grid; gap: 20px; scroll-margin-top: 80px; padding: 22px 24px; border: 1px solid var(--stroke-primary); border-radius: var(--r-m); min-width: 0; }
+      .x-report__empty { font: var(--type-body); color: var(--text-secondary); }
+      .x-verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font: var(--type-heading); }
+      .x-group { display: flex; align-items: center; gap: 8px; font: var(--type-heading); }
+      .x-list { list-style: none; margin: 0; padding: 0; }
+      .x-item { display: grid; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--stroke-secondary); min-width: 0; }
+      .x-item:last-child { border-bottom: 0; }
+      .x-item__top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: var(--type-body-strong); }
+      .x-item__desc { font: var(--type-small); color: var(--text-secondary); }
+      .x-hits { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+      .x-hits li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: baseline; }
+      .x-ln { font: var(--type-tag); color: var(--text-secondary); white-space: nowrap; }
+      .x-code { display: block; padding: 6px 10px; border-radius: 8px; background: var(--fill-tertiary); font: var(--weight-regular) var(--size-caption)/1.5 "Geist Mono", ui-monospace, Menlo, monospace; overflow-wrap: anywhere; white-space: pre-wrap; }
+      .x-sev { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: var(--r-pill); background: var(--fill-tertiary); color: var(--text-primary); font: var(--type-tag); white-space: nowrap; }
+      .x-sev::before { content: ""; width: 7px; height: 7px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--text-tertiary); }
+      .x-sev--crit::before { background: var(--fill-system-red); box-shadow: none; }
+      .x-sev--warn::before { background: var(--fill-system-orange); box-shadow: none; }
+      .x-sev--ok::before { background: var(--fill-system-green); box-shadow: none; }
+      .x-more { font: var(--type-caption); color: var(--text-secondary); }
+    </style>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <header class="nav glass" data-auto></header>
+      <main class="main">
+        <section class="hero">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">出品：Skill 实战实验室</p>
+            <h1>Skill 体检 · 中文 SKILL.md 检测与生成器</h1>
+            <p class="hero__sub">安装别人的 Skill 前先体检，写自己的 Skill 前先套标准模板。</p>
+            <p class="hero__meta">粘贴即查 · 数据不出浏览器 · 适用 Claude Code、Codex、扣子、SkillHub、OpenClaw 等</p>
+          </div>
+          <aside class="callout" aria-label="开始">
+            <p class="callout__head">10 秒上手</p>
+            <p class="callout__lead"><strong>粘贴 SKILL.md，10 秒出体检报告</strong></p>
+            <p class="fineprint">按 Agent Skills 开放标准核对字段，并扫描常见安全风险。</p>
+            <a class="btn" href="#check">开始体检</a>
+          </aside>
+        </section>
+
+        <section class="section" id="check" data-nav="体检">
+          <div class="head">
+            <p class="head__eyebrow">工具一</p>
+            <h2>Skill 体检：装之前先查一遍。</h2>
+            <p class="head__sub">规范检查依据 agentskills.io/specification，安全扫描给出人工复核提示。</p>
+          </div>
+          <div class="x-panel">
+            <div class="x-field">
+              <label for="c-input">粘贴完整 SKILL.md（含 --- 开头的 YAML 头）</label>
+              <textarea class="x-area x-area--big x-mono" id="c-input" spellcheck="false" placeholder="---&#10;name: my-skill&#10;description: 这个 Skill 做什么。当用户……时使用。&#10;---&#10;&#10;# 标题&#10;正文……"></textarea>
+              <p class="x-hint">提示：在输入框内按 Ctrl/Cmd + Enter 也能开始体检。</p>
+            </div>
+            <div class="x-field">
+              <label for="c-folder">Skill 文件夹名（选填，用于核对 name）</label>
+              <input class="x-input" id="c-folder" type="text" autocomplete="off" spellcheck="false" placeholder="例如 pdf-helper" />
+            </div>
+            <div class="links">
+              <button class="btn" type="button" id="c-run">开始体检</button>
+              <button class="btn" type="button" id="c-sample">载入示例</button>
+              <button class="btn" type="button" id="c-clear">清空</button>
+            </div>
+          </div>
+          <div class="x-report" id="c-report" aria-live="polite">
+            <p class="x-report__empty">报告会显示在这里。先粘贴 SKILL.md，或点「载入示例」看看报告长什么样。</p>
+          </div>
+          <div class="links" id="c-copybar">
+            <button class="btn" type="button" id="c-copy">复制报告</button>
+            <span class="x-msg" id="c-msg"></span>
+          </div>
+          <textarea class="x-area x-mono" id="c-text" readonly hidden aria-label="报告文本"></textarea>
+          <p class="fineprint">计分：满分 100，严重 −25、高危 −20、警告/中危 −8、提示 −2。A ≥90，B ≥75，C ≥60，D &lt;60；只要有严重或高危问题，等级最高为 C。</p>
+          <p class="fineprint">静态检查只能发现常见问题，干净结果不代表绝对安全；所有处理在你的浏览器内完成，内容不会上传。</p>
+        </section>
+
+        <section class="section" id="gen" data-nav="生成">
+          <div class="head">
+            <p class="head__eyebrow">工具二</p>
+            <h2>中文 Skill 生成器：填空，得到合规的 SKILL.md。</h2>
+            <p class="head__sub">右侧实时生成，可直接复制，或送去体检。</p>
+          </div>
+          <div class="pair">
+            <div class="x-panel">
+              <div class="x-field">
+                <label for="g-title">技能名称（中文，展示用）</label>
+                <input class="x-input" id="g-title" type="text" value="会议纪要整理" />
+              </div>
+              <div class="x-field">
+                <label for="g-name">name（英文标识）</label>
+                <input class="x-input x-mono" id="g-name" type="text" maxlength="64" autocomplete="off" spellcheck="false" value="meeting-notes" />
+                <p class="x-hint" id="g-name-hint">自动转为小写和连字符。规则：1–64 位，只用 a-z、0-9 和 -，不以 - 开头或结尾，不能有 --，与文件夹同名。</p>
+              </div>
+              <div class="x-field">
+                <label for="g-what">这个 Skill 做什么（1–2 句）</label>
+                <textarea class="x-area" id="g-what" rows="2">把会议录音转写稿或零散笔记整理成结构化纪要，提炼决议和待办事项。</textarea>
+              </div>
+              <div class="x-field">
+                <label for="g-when">什么时候触发（用户会怎么说，可多条，每行一条）</label>
+                <textarea class="x-area" id="g-when" rows="3">提到会议纪要或会议记录
+上传会议转写稿
+要求整理待办事项</textarea>
+                <p class="x-hint">每条会接在「当用户……时使用」里，读得通就行。</p>
+              </div>
+              <div class="x-field">
+                <label for="g-steps">操作步骤（每行一步）</label>
+                <textarea class="x-area" id="g-steps" rows="4">通读全文，找出会议主题、时间和参会人
+按议题归纳讨论要点
+单独列出已做出的决议
+提取待办事项，标注负责人和截止日期</textarea>
+              </div>
+              <div class="x-field">
+                <label for="g-format">输出格式要求（选填）</label>
+                <textarea class="x-area" id="g-format" rows="2">使用 Markdown，依次为：会议信息、讨论要点、决议、待办表格</textarea>
+              </div>
+              <div class="x-field">
+                <label for="g-dont">不要做的事（选填）</label>
+                <textarea class="x-area" id="g-dont" rows="2">不要编造原文中没有的决议或负责人
+不要省略任何待办事项</textarea>
+              </div>
+              <div class="x-field">
+                <label for="g-license">license</label>
+                <select class="x-select" id="g-license">
+                  <option value="MIT">MIT</option>
+                  <option value="Apache-2.0">Apache-2.0</option>
+                  <option value="Proprietary">专有·保留所有权利</option>
+                  <option value="" selected>不填</option>
+                </select>
+              </div>
+            </div>
+            <div class="x-field">
+              <label for="g-out">生成的 SKILL.md</label>
+              <textarea class="x-area x-area--out x-mono" id="g-out" readonly spellcheck="false"></textarea>
+              <p class="x-hint" id="g-count"></p>
+              <div class="links">
+                <button class="btn" type="button" id="g-copy">复制 SKILL.md</button>
+                <button class="btn" type="button" id="g-check">送去体检</button>
+              </div>
+              <p class="x-msg" id="g-msg"></p>
+              <p class="fineprint" id="g-note"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="why" data-nav="为什么">
+          <div class="head">
+            <h2>为什么要体检：三个最常见的坑。</h2>
+          </div>
+          <div class="cards">
+            <div>
+              <h3>权限很大</h3>
+              <p>Skill 能执行命令、读文件，装错等于给陌生人开了终端。</p>
+            </div>
+            <div>
+              <h3>不被调用</h3>
+              <p>description 写不好，Agent 根本不会调用。</p>
+            </div>
+            <div>
+              <h3>直接拒收</h3>
+              <p>名字不合规，很多平台直接拒收。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="spec" data-nav="速查表">
+          <div class="head">
+            <h2>合规速查表：每个字段的要求。</h2>
+            <p class="head__sub">依据 Agent Skills 开放标准。</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">字段</th>
+                  <th scope="col">必填</th>
+                  <th scope="col">要求</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="is-highlight">
+                  <th scope="row">name</th>
+                  <td>必填</td>
+                  <td>1–64 位，小写字母/数字/连字符，与文件夹同名</td>
+                </tr>
+                <tr class="is-highlight">
+                  <th scope="row">description</th>
+                  <td>必填</td>
+                  <td>1–1024 字符，写清做什么 + 何时用</td>
+                </tr>
+                <tr>
+                  <th scope="row">license</th>
+                  <td class="muted">选填</td>
+                  <td class="muted">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">compatibility</th>
+                  <td class="muted">选填</td>
+                  <td>≤500 字符</td>
+                </tr>
+                <tr>
+                  <th scope="row">metadata</th>
+                  <td class="muted">选填</td>
+                  <td>键值对</td>
+                </tr>
+                <tr>
+                  <th scope="row">allowed-tools</th>
+                  <td class="muted">选填</td>
+                  <td>实验性</td>
+                </tr>
+                <tr>
+                  <th scope="row">正文</th>
+                  <td>必填</td>
+                  <td>建议 ≤500 行，长内容放 references/</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="about" data-nav="关于">
+          <div class="head">
+            <h2>关于 Skill 实战实验室</h2>
+          </div>
+          <div class="prose">
+            <p>不比谁收录多，只看谁真能赚到钱。我们用 AI Skill 跑真实项目，公开方法与数据。</p>
+          </div>
+          <div class="links">
+            <a class="btn" href="https://noiz.bio/skills" target="_blank" rel="noopener">看实战榜单</a>
+          </div>
+        </section>
+
+        <section class="section" id="faq" data-nav="FAQ">
+          <div class="head">
+            <h2>常见问题</h2>
+          </div>
+          <div class="cards">
+            <div>
+              <h3>内容会上传吗？</h3>
+              <p>不会，全部在浏览器本地运行。</p>
+            </div>
+            <div>
+              <h3>支持哪些平台？</h3>
+              <p>遵循 Agent Skills 开放标准的平台，如 Claude Code、Codex、Cursor、Gemini CLI，以及国内兼容 SKILL.md 的 Agent 平台。</p>
+            </div>
+            <div>
+              <h3>体检通过就安全吗？</h3>
+              <p>不一定，它只做静态检查，安装前仍建议看一遍脚本。</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer class="foot">
+        <p>出品：<strong>Skill 实战实验室</strong> · 所有处理在浏览器本地完成。</p>
+        <nav aria-label="返回各部分" data-auto></nav>
+        <a class="badge" href="https://hark.com/" target="_blank" rel="noopener"><span class="hark-mark"></span><span>built by hark</span></a>
+      </footer>
+    </div>
+    <script src="hark.js"></script>
+    <script>
+      (function () {
+        "use strict";
+        var $ = function (id) { return document.getElementById(id); };
+        function esc(s) {
+          return String(s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+          });
+        }
+        function clen(s) { return Array.from(s).length; }
+        function str(v) {
+          if (v == null) return "";
+          if (typeof v === "string") return v;
+          return JSON.stringify(v);
+        }
+
+        /* ---------- YAML frontmatter ---------- */
+        function unquote(s) {
+          s = s.trim();
+          if (s[0] === '"') {
+            var out = "", i = 1;
+            while (i < s.length) {
+              var c = s[i];
+              if (c === "\\" && i + 1 < s.length) {
+                var n = s[i + 1];
+                if (n === "n") out += "\n";
+                else if (n === "t") out += "\t";
+                else if (n === "u" && /^[0-9a-fA-F]{4}$/.test(s.substr(i + 2, 4))) { out += String.fromCharCode(parseInt(s.substr(i + 2, 4), 16)); i += 4; }
+                else out += n;
+                i += 2; continue;
+              }
+              if (c === '"') return out;
+              out += c; i++;
+            }
+            return out;
+          }
+          if (s[0] === "'") {
+            var o = "", j = 1;
+            while (j < s.length) {
+              if (s[j] === "'") {
+                if (s[j + 1] === "'") { o += "'"; j += 2; continue; }
+                return o;
+              }
+              o += s[j]; j++;
+            }
+            return o;
+          }
+          return s.replace(/\s+#.*$/, "").trim();
+        }
+
+        function parseYaml(lines, a, b, res) {
+          var k = a;
+          while (k < b) {
+            var line = lines[k];
+            if (/^\s*(#.*)?$/.test(line)) { k++; continue; }
+            var m = /^([A-Za-z0-9_.-]+)\s*:(?:\s+(.*))?\s*$/.exec(line);
+            if (!m || /^\s/.test(line)) { res.bad.push(k); k++; continue; }
+            var key = m[1], v = (m[2] || "").trim(), at = k;
+            k++;
+            var cont = [];
+            while (k < b && (lines[k].trim() === "" || /^\s/.test(lines[k]))) { cont.push(lines[k]); k++; }
+            while (cont.length && cont[cont.length - 1].trim() === "") cont.pop();
+            var val, bm = /^([>|])([+-]?)(\d?)\s*(#.*)?$/.exec(v);
+            if (bm) {
+              var ind = Infinity;
+              cont.forEach(function (l) { if (l.trim()) ind = Math.min(ind, l.match(/^\s*/)[0].length); });
+              if (ind === Infinity) ind = 0;
+              var ls = cont.map(function (l) { return l.trim() ? l.slice(ind) : ""; });
+              if (bm[1] === "|") val = ls.join("\n");
+              else val = ls.join("\n").split(/\n\s*\n/).map(function (p) {
+                return p.split("\n").map(function (x) { return x.trim(); }).join(" ");
+              }).join("\n");
+              val = val.trim();
+            } else if (v === "") {
+              var first = cont.filter(function (l) { return l.trim(); })[0] || "";
+              if (/^\s+[A-Za-z0-9_.-]+\s*:(\s|$)/.test(first)) {
+                val = {};
+                cont.forEach(function (l) {
+                  var mm = /^\s+([A-Za-z0-9_.-]+)\s*:\s*(.*)$/.exec(l);
+                  if (mm) val[mm[1]] = unquote(mm[2]);
+                });
+              } else if (/^\s*-\s/.test(first)) {
+                val = cont.filter(function (l) { return l.trim(); }).map(function (l) { return unquote(l.replace(/^\s*-\s*/, "")); });
+              } else {
+                val = cont.map(function (l) { return l.trim(); }).filter(Boolean).join(" ");
+              }
+            } else if (v[0] === '"' || v[0] === "'") {
+              val = unquote([v].concat(cont.map(function (l) { return l.trim(); })).join(" "));
+            } else {
+              val = [unquote(v)].concat(cont.map(function (l) { return l.trim(); }).filter(Boolean)).join(" ").trim();
+            }
+            if (Object.prototype.hasOwnProperty.call(res.fields, key)) res.dupes.push(at);
+            res.fields[key] = val;
+            res.keyLine[key] = at;
+          }
+        }
+
+        function parseDoc(raw) {
+          var text = raw.replace(/\r\n?/g, "\n");
+          var lines = text.split("\n");
+          var res = { lines: lines, error: null, fmStart: -1, fmEnd: -1, bodyStart: 0, fields: {}, keyLine: {}, dupes: [], bad: [] };
+          var i = 0;
+          while (i < lines.length && lines[i].replace(/^\uFEFF/, "").trim() === "") i++;
+          if (i >= lines.length || lines[i].replace(/^\uFEFF/, "").trim() !== "---") { res.error = "missing"; return res; }
+          res.fmStart = i;
+          var j = i + 1;
+          while (j < lines.length && lines[j].trim() !== "---") j++;
+          if (j >= lines.length) { res.error = "unclosed"; return res; }
+          res.fmEnd = j;
+          res.bodyStart = j + 1;
+          parseYaml(lines, i + 1, j, res);
+          return res;
+        }
+
+        /* ---------- checks ---------- */
+        var RANK = { "严重": 0, "高危": 1, "警告": 2, "中危": 3, "提示": 4 };
+        var COST = { "严重": 25, "高危": 20, "警告": 8, "中危": 8, "提示": 2 };
+        var ALLOWED = ["name", "description", "license", "compatibility", "metadata", "allowed-tools"];
+        var TRIGGER = /何时使用|什么时候|当用户|当你|适用于|适用场景|触发|use\s+(this\s+)?(skill\s+)?when|when\s+(the\s+)?user|当[^。\n]{1,40}时|在[^。\n]{1,30}时使用/i;
+
+        function snip(line, idx) {
+          var t = line;
+          idx = idx || 0;
+          if (t.length > 140) {
+            var s = Math.max(0, idx - 50);
+            t = (s > 0 ? "…" : "") + t.substr(s, 140) + (s + 140 < line.length ? "…" : "");
+          }
+          return t.trim();
+        }
+        function slugify(s) {
+          var r = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "").slice(0, 64).replace(/-+$/, "");
+          return r || "my-skill";
+        }
+        function mask(line) {
+          return line
+            .replace(/(sk-[A-Za-z0-9_-]{4})[A-Za-z0-9_-]{16,}/g, "$1••••")
+            .replace(/(AKIA[0-9A-Z]{4})[0-9A-Z]{12}/g, "$1••••")
+            .replace(/(ghp_[A-Za-z0-9]{4})[A-Za-z0-9]{26,}/g, "$1••••")
+            .replace(/(api[_-]?key\s*["']?\s*[:=]\s*["']?[A-Za-z0-9_.-]{4})[A-Za-z0-9_.-]{12,}/gi, "$1••••");
+        }
+
+        var RULES = [
+          { sev: "高危", title: "管道执行远程脚本", desc: "下载后直接交给 shell 执行，脚本内容随时可被替换。先下载、看过再运行。",
+            res: [/\b(curl|wget)\b[^\n|]*\|\s*(sudo\s+)?(ba|z|da|k)?sh\b/i, /\b(ba|z)?sh\s+<\(\s*(curl|wget)\b/i] },
+          { sev: "高危", title: "递归强制删除 rm -rf", desc: "路径写错或变量为空时可能删掉整个目录。确认删除范围。",
+            res: [/\brm\s+-(?:[a-z]*r[a-z]*f|[a-z]*f[a-z]*r)[a-z]*\b/i, /\brm\s+(-r\s+-f|-f\s+-r)\b/i] },
+          { sev: "高危", title: "chmod 777", desc: "把文件设为所有人可读写执行，会降低系统安全性。", res: [/\bchmod\s+(-R\s+)?0?777\b/i] },
+          { sev: "高危", title: "使用 sudo 提权", desc: "Skill 请求管理员权限执行命令，确认确有必要。", res: [/\bsudo\b/] },
+          { sev: "高危", title: "格式化磁盘 mkfs", desc: "mkfs 会清空整个分区。", res: [/\bmkfs(\.\w+)?\b/i] },
+          { sev: "高危", title: "底层磁盘写入 dd if=", desc: "dd 可直接覆盖磁盘数据。", res: [/\bdd\s+if=/i] },
+          { sev: "高危", title: "base64 解码后执行", desc: "把编码内容解码后交给程序执行，常用于隐藏真实命令。解码看看内容。",
+            res: [/base64\s+(-d|--decode|-D)\b[^\n]*\|/i, /b64decode\([^\n]*\)[^\n]*(exec|eval)\s*\(/i] },
+          { sev: "高危", title: "动态执行 eval", desc: "eval 会执行任意字符串，确认传入的内容可信。", res: [/\beval\s*\(/, /\beval\s+["'$`]/] },
+          { sev: "高危", title: "动态执行 exec", desc: "exec 会执行任意代码或命令，确认传入的内容可信。", res: [/\bexec\s*\(/] },
+          { sev: "高危", title: "疑似硬编码密钥", desc: "文件里出现了像 API Key 或访问令牌的字符串。密钥不应写进 Skill，若是真实密钥请立即作废。", masked: true,
+            res: [/\bsk-[A-Za-z0-9_-]{20,}/, /AKIA[0-9A-Z]{16}/, /ghp_[A-Za-z0-9]{30,}/, /api[_-]?key\s*["']?\s*[:=]\s*["']?[A-Za-z0-9_.-]{16,}/i] },
+          { sev: "高危", title: "疑似提示注入", desc: "要求 Agent 忽略原有指令或对用户隐瞒信息，这是典型的恶意写法。",
+            res: [/ignore\s+(all\s+)?(the\s+)?(previous|prior|above)\s+instructions/i, /忽略(之前|以上|上面|前面|先前|此前)/, /不要(告诉|告知)用户/, /do\s+not\s+tell\s+the\s+user|don['’]t\s+tell\s+the\s+user/i] },
+          { sev: "中危", title: "读取敏感路径", desc: "涉及 SSH 密钥、环境变量文件、系统账户或浏览器 Cookies，确认读取目的。",
+            res: [/~\/\.ssh|\.ssh\//, /(^|[^\w.])\.env\b/, /id_rsa/, /\/etc\/passwd/, /Cookies(\.sqlite|\.binarycookies)?\b|浏览器\s*Cookie/i] }
+        ];
+        var INVIS = /[\u200B-\u200F\u2060\uFEFF\u202A-\u202E\u2066-\u2069]/g;
+        var INVIS_NAME = { "200B": "零宽空格", "200C": "零宽非连接符", "200D": "零宽连接符", "200E": "从左到右标记", "200F": "从右到左标记", "2060": "单词连接符", "FEFF": "零宽不换行空格", "202A": "双向控制符", "202B": "双向控制符", "202C": "双向控制符", "202D": "双向控制符", "202E": "双向反转覆盖", "2066": "双向隔离符", "2067": "双向隔离符", "2068": "双向隔离符", "2069": "双向隔离符" };
+        function hex(c) { return c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0"); }
+
+        function audit(raw, folder) {
+          var P = parseDoc(raw), L = P.lines, spec = [], sec = [];
+          function add(list, sev, title, desc, hits) { list.push({ sev: sev, title: title, desc: desc, hits: hits || [] }); }
+          function at(k) { return [{ line: k + 1, text: snip(mask(L[k])) }]; }
+          var f = P.fields;
+
+          if (P.error === "missing") {
+            add(spec, "严重", "缺少 YAML frontmatter", "文件必须以 --- 开头，在两行 --- 之间写 name 和 description。");
+          } else if (P.error === "unclosed") {
+            add(spec, "严重", "frontmatter 没有闭合", "找到了开头的 ---，但缺少第二个 ---，平台读不出 name 和 description。", at(P.fmStart));
+          } else {
+            if (P.bad.length) add(spec, "提示", "frontmatter 有无法解析的行", "这些行不是 key: value 格式，部分平台会报错。", P.bad.map(function (k) { return at(k)[0]; }));
+            if (P.dupes.length) add(spec, "警告", "frontmatter 字段重复", "同一字段写了多次，只有最后一次生效。", P.dupes.map(function (k) { return at(k)[0]; }));
+
+            var name = str(f.name).trim();
+            var nh = "name" in f ? at(P.keyLine.name) : [];
+            if (!name) {
+              add(spec, "严重", "缺少 name", "name 必填，1–64 位小写字母、数字和连字符。", nh);
+            } else {
+              if (clen(name) > 64) add(spec, "严重", "name 超过 64 字符", "当前 " + clen(name) + " 字符，上限 64。", nh);
+              if (/[^a-z0-9-]/.test(name)) {
+                var bad = [];
+                if (/[A-Z]/.test(name)) bad.push("大写字母");
+                if (/\s/.test(name)) bad.push("空格");
+                if (/_/.test(name)) bad.push("下划线");
+                if (/[^\x00-\x7f]/.test(name)) bad.push("中文或其他非 ASCII 字符");
+                if (/[^A-Za-z0-9\s_\x80-\uFFFF-]/.test(name)) bad.push("其他符号");
+                add(spec, "严重", "name 含不允许的字符", "只允许小写字母 a-z、数字和连字符 -。发现：" + bad.join("、") + "。可改为：" + slugify(name), nh);
+              }
+              if (/^-|-$/.test(name)) add(spec, "严重", "name 以连字符开头或结尾", "去掉首尾的 -。", nh);
+              if (/--/.test(name)) add(spec, "严重", "name 含连续的 --", "连字符之间要有字母或数字。", nh);
+              if (folder && folder !== name) add(spec, "严重", "name 与文件夹名不一致", "文件夹「" + folder + "」，name「" + name + "」。平台按文件夹查找 Skill，两者必须相同。", nh);
+            }
+
+            var d = str(f.description).trim();
+            var dh = "description" in f ? at(P.keyLine.description) : [];
+            if (!d) {
+              add(spec, "严重", "缺少 description", "description 必填，1–1024 字符，写清做什么、何时用。", dh);
+            } else {
+              var n = clen(d);
+              if (n > 1024) add(spec, "严重", "description 超过 1024 字符", "当前 " + n + " 字符，上限 1024。", dh);
+              else if (n < 40) add(spec, "警告", "描述太短，Agent 可能不会触发", "当前 " + n + " 字符。写清做什么、何时用，建议 40 字符以上。", dh);
+              if (!TRIGGER.test(d)) add(spec, "警告", "description 缺少触发语句", "Agent 靠 description 判断何时调用。加一句如「当用户要求……时使用」或 “Use when …”。", dh);
+            }
+
+            if ("compatibility" in f) {
+              var cn = clen(str(f.compatibility));
+              if (cn > 500) add(spec, "警告", "compatibility 超过 500 字符", "当前 " + cn + " 字符，上限 500。", at(P.keyLine.compatibility));
+            }
+            if ("metadata" in f && typeof f.metadata !== "object" && !/^\{/.test(str(f.metadata).trim())) {
+              add(spec, "警告", "metadata 不是键值对", "metadata 应写成缩进的 key: value 列表。", at(P.keyLine.metadata));
+            }
+            Object.keys(f).forEach(function (key) {
+              if (ALLOWED.indexOf(key) < 0) add(spec, "提示", "非标准字段：" + key, "非标准字段，部分平台会忽略。标准字段：" + ALLOWED.join("、") + "。", at(P.keyLine[key]));
+            });
+          }
+
+          if (P.error !== "unclosed") {
+            var body = L.slice(P.bodyStart);
+            while (body.length && body[body.length - 1].trim() === "") body.pop();
+            var bodyText = body.join("\n").trim();
+            if (!bodyText) add(spec, "严重", "正文为空", "frontmatter 之后要写具体的使用说明和步骤，Agent 才知道怎么做。");
+            else if (body.length > 500) add(spec, "警告", "正文超过 500 行", "当前 " + body.length + " 行。建议拆到 references/ 渐进加载。");
+          }
+
+          /* security */
+          RULES.forEach(function (r) {
+            var hits = [];
+            L.forEach(function (line, k) {
+              for (var i = 0; i < r.res.length; i++) {
+                var mm = r.res[i].exec(line);
+                if (mm) { hits.push({ line: k + 1, text: snip(mask(line), mm.index) }); break; }
+              }
+            });
+            if (hits.length) add(sec, r.sev, r.title, r.desc + "（人工复核提示，不是定论）", hits);
+          });
+
+          var ih = [];
+          L.forEach(function (line, k) {
+            var found = [], mm;
+            INVIS.lastIndex = 0;
+            while ((mm = INVIS.exec(line))) {
+              if (k === 0 && mm.index === 0 && mm[0] === "\uFEFF") continue;
+              var h = hex(mm[0]);
+              if (found.indexOf(h) < 0) found.push(h);
+            }
+            if (found.length) {
+              var shown = line.replace(INVIS, function (c, idx) {
+                return k === 0 && idx === 0 && c === "\uFEFF" ? "" : "⟦U+" + hex(c) + "⟧";
+              });
+              ih.push({ line: k + 1, text: found.map(function (h) { return "U+" + h + " " + INVIS_NAME[h]; }).join("，") + "：" + snip(shown) });
+            }
+          });
+          if (ih.length) add(sec, "中危", "不可见字符", "零宽字符和双向控制符肉眼看不见，可能藏着指令或让代码显示与实际不同。（人工复核提示，不是定论）", ih);
+
+          var urls = [], seen = {};
+          L.forEach(function (line, k) {
+            var re = /https?:\/\/[^\s<>"'`)\]）」，。]+/g, mm;
+            while ((mm = re.exec(line))) {
+              var u = mm[0].replace(/[.,;:!?]+$/, "");
+              if (!seen[u]) { seen[u] = 1; urls.push({ line: k + 1, text: u }); }
+            }
+          });
+          if (urls.length) add(sec, "提示", "外部网址 " + urls.length + " 个", "逐个确认来源可信，尤其是脚本和安装包的下载地址。", urls);
+
+          var sort = function (a, b) { return RANK[a.sev] - RANK[b.sev]; };
+          spec.sort(sort); sec.sort(sort);
+          var score = 100;
+          spec.concat(sec).forEach(function (it) { score -= COST[it.sev]; });
+          score = Math.max(0, score);
+          var grade = score >= 90 ? "A" : score >= 75 ? "B" : score >= 60 ? "C" : "D";
+          var serious = spec.concat(sec).some(function (it) { return it.sev === "严重" || it.sev === "高危"; });
+          if (serious && (grade === "A" || grade === "B")) grade = "C";
+          var verdict = { A: "可以放心用", B: "小问题，建议修", C: "先修再装", D: "不建议安装" }[grade];
+          return { spec: spec, sec: sec, score: score, grade: grade, verdict: verdict };
+        }
+
+        /* ---------- report UI ---------- */
+        var cInput = $("c-input"), cFolder = $("c-folder"), cReport = $("c-report"), cText = $("c-text"), cBar = $("c-copybar"), cMsg = $("c-msg");
+        var lastText = "";
+        function sevClass(s) { return s === "严重" || s === "高危" ? "x-sev--crit" : s === "警告" || s === "中危" ? "x-sev--warn" : ""; }
+        function itemHTML(it) {
+          var hits = it.hits.slice(0, 10).map(function (h) {
+            return '<li><span class="x-ln">第 ' + h.line + ' 行</span><code class="x-code">' + esc(h.text) + "</code></li>";
+          }).join("");
+          var more = it.hits.length > 10 ? '<p class="x-more">另有 ' + (it.hits.length - 10) + " 处未列出</p>" : "";
+          return '<li class="x-item"><div class="x-item__top"><span class="x-sev ' + sevClass(it.sev) + '">' + it.sev + "</span>" + esc(it.title) +
+            '</div><p class="x-item__desc">' + esc(it.desc) + "</p>" + (hits ? '<ul class="x-hits">' + hits + "</ul>" : "") + more + "</li>";
+        }
+        function groupHTML(title, list, okText) {
+          return '<div><h3 class="x-group">' + title + ' <span class="pill">' + list.length + "</span></h3>" +
+            (list.length ? '<ul class="x-list">' + list.map(itemHTML).join("") + "</ul>" : '<p><span class="dot">' + okText + "</span></p>") + "</div>";
+        }
+        function reportText(r) {
+          var out = ["Skill 体检报告", "分数：" + r.score + "/100　等级：" + r.grade + "　结论：" + r.verdict, ""];
+          [["规范问题", r.spec], ["安全风险", r.sec]].forEach(function (g) {
+            out.push("【" + g[0] + "】" + (g[1].length ? g[1].length + " 项" : "未发现"));
+            g[1].forEach(function (it) {
+              out.push("[" + it.sev + "] " + it.title, "  " + it.desc);
+              it.hits.forEach(function (h) { out.push("  第 " + h.line + " 行：" + h.text); });
+            });
+            out.push("");
+          });
+          out.push("静态检查只能发现常见问题，干净结果不代表绝对安全。");
+          return out.join("\n");
+        }
+        function run() {
+          cText.hidden = true; cMsg.textContent = "";
+          var raw = cInput.value;
+          if (!raw.trim()) {
+            cReport.innerHTML = '<p class="x-report__empty">还没有内容。把完整的 SKILL.md 粘贴到上面的输入框，或点「载入示例」先试一下。</p>';
+            lastText = "";
+            return;
+          }
+          var folder = cFolder.value.trim().replace(/[\\/]+$/, "").split(/[\\/]/).pop();
+          var r = audit(raw, folder);
+          var total = r.spec.length + r.sec.length;
+          cReport.innerHTML =
+            '<section class="stats"><div class="stat"><span class="stat__fig">' + r.score + '</span><span class="stat__label">体检分（满分 100）</span></div>' +
+            '<div class="stat"><span class="stat__fig">' + r.grade + '</span><span class="stat__label">等级</span></div>' +
+            '<div class="stat"><span class="stat__fig">' + total + '</span><span class="stat__label">发现问题</span></div></section>' +
+            '<p class="x-verdict"><span class="x-sev ' + (r.grade === "A" ? "x-sev--ok" : r.grade === "B" ? "" : r.grade === "C" ? "x-sev--warn" : "x-sev--crit") + '">' + r.grade + " 级</span>" + r.verdict + "</p>" +
+            groupHTML("规范问题", r.spec, "未发现规范问题") + groupHTML("安全风险", r.sec, "未发现常见风险");
+          lastText = reportText(r);
+          cBar.hidden = false;
+        }
+
+        function copyFrom(ta, msgEl) {
+          var fallback = "浏览器不允许自动复制，已全选内容，请按 Ctrl+C（Mac 按 Cmd+C）复制。";
+          ta.focus();
+          ta.select();
+          try { ta.setSelectionRange(0, ta.value.length); } catch (e) {}
+          var ok = false;
+          try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+          if (ok) { msgEl.textContent = "已复制到剪贴板。"; return; }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(ta.value).then(function () { msgEl.textContent = "已复制到剪贴板。"; }, function () { ta.select(); msgEl.textContent = fallback; });
+          } else msgEl.textContent = fallback;
+        }
+
+        var SAMPLE = [
+          "---",
+          "name: PDF-Helper",
+          "description: 处理 PDF 文件",
+          "version: 1.2",
+          "---",
+          "",
+          "# PDF 助手",
+          "",
+          "把 PDF 转成文字并总结要点。",
+          "",
+          "## 安装依赖",
+          "",
+          "先运行下面的命令安装工具：",
+          "",
+          "curl -fsSL https://example.com/install.sh | bash",
+          "",
+          "## 步骤",
+          "",
+          "1. 用 pdftotext 提取文字",
+          "2. 按章节总结要点",
+          "3. 按 https://agentskills.io/specification 的格式输出"
+        ].join("\n");
+
+        $("c-run").addEventListener("click", run);
+        $("c-sample").addEventListener("click", function () { cInput.value = SAMPLE; cFolder.value = ""; run(); });
+        $("c-clear").addEventListener("click", function () {
+          cInput.value = ""; cFolder.value = ""; cText.hidden = true; cMsg.textContent = ""; lastText = "";
+          cReport.innerHTML = '<p class="x-report__empty">报告会显示在这里。先粘贴 SKILL.md，或点「载入示例」看看报告长什么样。</p>';
+          cInput.focus();
+        });
+        cInput.addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); } });
+        $("c-copy").addEventListener("click", function () {
+          if (!lastText && cInput.value.trim()) run();
+          if (!lastText) {
+            cText.hidden = true;
+            cMsg.textContent = "还没有报告可复制。先粘贴 SKILL.md 并点「开始体检」，或点「载入示例」。";
+            cInput.focus();
+            return;
+          }
+          cText.value = lastText;
+          cText.hidden = false;
+          cText.style.height = Math.min(480, Math.max(160, cText.scrollHeight + 4)) + "px";
+          copyFrom(cText, cMsg);
+        });
+
+        /* ---------- generator ---------- */
+        var g = {};
+        ["title", "name", "what", "when", "steps", "format", "dont", "license", "out", "count", "msg", "note", "name-hint"].forEach(function (k) { g[k] = $("g-" + k); });
+        var LICENSE = { "MIT": "MIT", "Apache-2.0": "Apache-2.0", "Proprietary": "专有·保留所有权利" };
+        function rows(v) { return v.split(/\r?\n/).map(function (s) { return s.replace(/^\s*(?:[-*•·]\s*|\d+\s*[.、)）]\s*)/, "").trim(); }).filter(Boolean); }
+        function yq(s) { return '"' + s.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
+        function nameErrors(n) {
+          var e = [];
+          if (!n) e.push("name 必填");
+          if (clen(n) > 64) e.push("超过 64 位");
+          if (/[^a-z0-9-]/.test(n)) e.push("只能用 a-z、0-9 和 -");
+          if (/^-|-$/.test(n)) e.push("不能以 - 开头或结尾");
+          if (/--/.test(n)) e.push("不能有连续的 --");
+          return e;
+        }
+        function sanitizeName(v) {
+          return v.toLowerCase().replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-{2,}/g, "-").replace(/^-+/, "");
+        }
+        function generate() {
+          var title = g.title.value.trim();
+          var name = g.name.value.trim();
+          var what = g.what.value.replace(/\s*\n\s*/g, " ").trim();
+          var triggers = rows(g.when.value).map(function (t) { return t.replace(/[。；;，,、]+$/, ""); });
+          var steps = rows(g.steps.value), fmt = rows(g.format.value), dont = rows(g.dont.value);
+          var lic = g.license.value;
+
+          if (what && !/[。.!！?？]$/.test(what)) what += "。";
+          var desc = what;
+          if (triggers.length) desc = (what ? what + " " : "") + "当用户" + triggers.join("、") + "时使用。";
+          var dl = clen(desc), cut = false;
+          if (dl > 1024) { desc = Array.from(desc).slice(0, 1024).join(""); cut = true; }
+
+          var out = ["---", "name: " + (name || "your-skill-name"), "description: " + yq(desc)];
+          if (lic) out.push("license: " + (lic === "Proprietary" ? yq(LICENSE[lic]) : lic));
+          out.push("---", "", "# " + (title || name || "未命名技能"), "", "## 何时使用", "");
+          if (triggers.length) triggers.forEach(function (t) { out.push("- " + t); });
+          else out.push("- （在左侧填写触发场景）");
+          out.push("", "## 步骤", "");
+          if (steps.length) steps.forEach(function (s, i) { out.push(i + 1 + ". " + s); });
+          else out.push("1. （在左侧填写操作步骤）");
+          if (fmt.length) { out.push("", "## 输出格式", ""); fmt.length === 1 ? out.push(fmt[0]) : fmt.forEach(function (s) { out.push("- " + s); }); }
+          if (dont.length) { out.push("", "## 不要做", ""); dont.forEach(function (s) { out.push("- " + s); }); }
+          g.out.value = out.join("\n") + "\n";
+
+          var cnt = "description：" + clen(desc) + " / 1024 字符";
+          var bad = false;
+          if (cut) { cnt += "。原文 " + dl + " 字符，已截断到 1024，请精简。"; bad = true; }
+          else if (!desc) { cnt += "。请填写「这个 Skill 做什么」。"; bad = true; }
+          else if (clen(desc) < 40) { cnt += "。偏短，建议 40 字符以上，Agent 才知道何时调用。"; bad = true; }
+          else if (!triggers.length) { cnt += "。建议填写触发语句。"; bad = true; }
+          g.count.textContent = cnt;
+          g.count.className = "x-hint" + (bad ? " is-bad" : "");
+
+          var errs = nameErrors(name);
+          g["name-hint"].textContent = errs.length
+            ? "✗ " + errs.join("；") + "。规则：1–64 位，只用 a-z、0-9 和 -，不以 - 开头或结尾，不能有 --，与文件夹同名。"
+            : "✓ 合规。文件夹也要叫 " + name + "。";
+          g["name-hint"].className = "x-hint " + (errs.length ? "is-bad" : "is-good");
+          g.note.textContent = "保存为 " + (name || "<name>") + "/SKILL.md，放进 Claude Code 的 .claude/skills/、Codex 或支持 Agent Skills 的平台即可使用。";
+          g.msg.textContent = "";
+        }
+        g.name.addEventListener("input", function (e) {
+          if (e.isComposing) return;
+          var s = sanitizeName(g.name.value);
+          if (s !== g.name.value) g.name.value = s;
+          generate();
+        });
+        g.name.addEventListener("compositionend", function () { g.name.value = sanitizeName(g.name.value); generate(); });
+        g.name.addEventListener("blur", function () { g.name.value = sanitizeName(g.name.value).replace(/-+$/, "").slice(0, 64); generate(); });
+        ["title", "what", "when", "steps", "format", "dont"].forEach(function (k) { g[k].addEventListener("input", generate); });
+        g.license.addEventListener("change", generate);
+        $("g-copy").addEventListener("click", function () { copyFrom(g.out, g.msg); });
+        $("g-check").addEventListener("click", function () {
+          cInput.value = g.out.value;
+          cFolder.value = g.name.value.trim();
+          run();
+          var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          cReport.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+        });
+        generate();
+      })();
+    </script>
+  </body>
+</html>

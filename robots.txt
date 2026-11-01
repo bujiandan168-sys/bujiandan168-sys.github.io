@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bujiandan168-sys.github.io/sitemap.xml
