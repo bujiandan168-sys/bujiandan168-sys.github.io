@@ -502,6 +502,15 @@
               if (!TRIGGER.test(d)) add(spec, "警告", "description 缺少触发语句", "Agent 靠 description 判断何时调用。加一句如「当用户要求……时使用」或 “Use when …”。", dh);
             }
 
+            if (d) {
+              var nm = str(f.name).trim().toLowerCase().replace(/[-_\s]+/g, "");
+              var dn = d.toLowerCase().replace(/[-_\s.。，,:：!！]+/g, "");
+              if (nm && (dn === nm || dn === nm + "skill" || dn === "a" + nm + "skill")) add(spec, "警告", "description 只是把名字抄了一遍", "没有说明做什么、何时用。写出具体场景和产出，例如「把会议录音整理成带待办的纪要。当用户要……时使用」。", dh);
+              var FL = /best practices|production[- ]ready|powerful|comprehensive|seamless|state[- ]of[- ]the[- ]art|一站式|全方位|最佳实践|开箱即用|强大的|赋能|极致|智能化/ig;
+              var fm = d.match(FL);
+              if (fm && fm.length >= 2) add(spec, "提示", "description 有注水套话", "出现「" + fm.slice(0, 3).join("、") + "」等空话。Agent 靠具体动作和触发场景判断是否调用，换成可验证的描述。", dh);
+            }
+
             if ("compatibility" in f) {
               var cn = clen(str(f.compatibility));
               if (cn > 500) add(spec, "警告", "compatibility 超过 500 字符", "当前 " + cn + " 字符，上限 500。", at(P.keyLine.compatibility));
