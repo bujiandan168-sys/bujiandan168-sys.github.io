@@ -1,0 +1,19 @@
+name: cancel stuck pages deployment
+on:
+  push:
+    paths: ['.github/workflows/cancel-stuck-pages.yml']
+  workflow_dispatch:
+permissions:
+  pages: write
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel stuck deployment a9e0c77
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/deployments/a9e0c77885f5de9ff7cf092d563dc809a918a55b/cancel -w '\nHTTP %{http_code}\n'
+          curl -sS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/deployments/a9e0c77885f5de9ff7cf092d563dc809a918a55b -w '\nHTTP %{http_code}\n'
