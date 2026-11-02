@@ -33,6 +33,7 @@
 | [`wechat-article`](./wechat-article/SKILL.md) | 公众号长文：标题、摘要、大纲、Markdown 正文、文末转化 | 标题 ≤64 / 摘要 ≤120、诱导分享 |
 | [`ai-ppt-cn`](./ai-ppt-cn/SKILL.md) | 中文 PPT：主线、结论式标题、每页讲稿，交付 Marp Markdown，可导出 PPTX/PDF | 每页 ≤3 要点、讲稿完整、页数匹配时长 |
 | [`x-thread-en2cn`](./x-thread-en2cn/SKILL.md) | 英文 X 热帖编译为中文帖（即刻/微博/X 中文串/小红书/公众号） | 出处完整、引用 ≤2 句、X 加权字数 |
+| [`short-drama-cn`](./short-drama-cn/SKILL.md) | AI 短剧/漫剧：创意→人物卡→分集大纲→分场剧本→分镜→即梦/可灵提示词 | 角色一致性、每集钩子、合规自检 |
 
 ## 目录结构
 
@@ -157,7 +158,7 @@ MIT，见仓库根目录 [LICENSE](../LICENSE)。可免费使用、修改、转�
 
 ## English
 
-**zh-skills** is a pack of 6 [Agent Skills](https://agentskills.io) for Chinese-language content work. Skill bodies are in Simplified Chinese; descriptions are bilingual so agents and directory search match both Chinese and English queries.
+**zh-skills** is a pack of 7 [Agent Skills](https://agentskills.io) for Chinese-language content work. Skill bodies are in Simplified Chinese; descriptions are bilingual so agents and directory search match both Chinese and English queries.
 
 | Skill | What it does |
 |---|---|
@@ -167,6 +168,7 @@ MIT，见仓库根目录 [LICENSE](../LICENSE)。可免费使用、修改、转�
 | `wechat-article` | Long-form WeChat Official Account articles: title ≤64, digest ≤120, outline, Markdown body |
 | `ai-ppt-cn` | Chinese slide decks as Marp Markdown with speaker notes, exportable to PPTX/PDF |
 | `x-thread-en2cn` | Adapt English X/Twitter threads into Chinese posts with attribution and X weighted-length checks |
+| `short-drama-cn` | Chinese AI short-drama/comic-drama writing: character cards, episode outline, scenes, shot list, video-model prompts, consistency and compliance checks |
 
 **Install**
 
