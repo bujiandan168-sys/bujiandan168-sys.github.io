@@ -106,6 +106,7 @@
             <span class="x-msg" id="c-msg"></span>
           </div>
           <textarea class="x-area x-mono" id="c-text" readonly hidden aria-label="报告文本"></textarea>
+          <p class="fineprint">中文版 agnix · 浏览器内零安装：每条问题可一键复制修复建议。</p>
           <p class="fineprint">计分：满分 100，严重 −25、高危 −20、警告/中危 −8、提示 −2。A ≥90，B ≥75，C ≥60，D &lt;60；只要有严重或高危问题，等级最高为 C。</p>
           <p class="fineprint">静态检查只能发现常见问题，干净结果不代表绝对安全；所有处理在你的浏览器内完成，内容不会上传。</p>
         </section>
@@ -597,7 +598,8 @@
           }).join("");
           var more = it.hits.length > 10 ? '<p class="x-more">另有 ' + (it.hits.length - 10) + " 处未列出</p>" : "";
           return '<li class="x-item"><div class="x-item__top"><span class="x-sev ' + sevClass(it.sev) + '">' + it.sev + "</span>" + esc(it.title) +
-            '</div><p class="x-item__desc">' + esc(it.desc) + "</p>" + (hits ? '<ul class="x-hits">' + hits + "</ul>" : "") + more + "</li>";
+            '</div><p class="x-item__desc">' + esc(it.desc) + "</p>" + (hits ? '<ul class="x-hits">' + hits + "</ul>" : "") + more +
+            '<button class="btn x-fixbtn" type="button" data-fix="' + esc("【" + it.sev + "】" + it.title + "\n修复建议：" + it.desc) + '">复制修复建议</button></li>";
         }
         function groupHTML(title, list, okText) {
           return '<div><h3 class="x-group">' + title + ' <span class="pill">' + list.length + "</span></h3>" +
@@ -637,6 +639,14 @@
           cBar.hidden = false;
         }
 
+        cReport.addEventListener("click", function (e) {
+          var b = e.target.closest ? e.target.closest(".x-fixbtn") : null;
+          if (!b) return;
+          var t = b.getAttribute("data-fix"), d = b.textContent;
+          function ok() { b.textContent = "已复制 ✓"; setTimeout(function () { b.textContent = d; }, 1500); }
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { cMsg.textContent = "复制失败，请手动选择文字。"; });
+          else { var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (x) {} document.body.removeChild(ta); }
+        });
         function copyFrom(ta, msgEl) {
           var fallback = "浏览器不允许自动复制，已全选内容，请按 Ctrl+C（Mac 按 Cmd+C）复制。";
           ta.focus();
