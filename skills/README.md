@@ -5,7 +5,7 @@
 **小红书 · 抖音/视频号 · 公众号 · 中文 GEO · 中文 PPT · X 热帖编译**
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-spec%20compliant-4b32c3)](https://agentskills.io/specification)
-[![Skills](https://img.shields.io/badge/skills-6-blue)](#技能一览)
+[![Skills](https://img.shields.io/badge/skills-8-blue)](#技能一览)
 [![Version](https://img.shields.io/badge/version-1.0.0-green)](#更新日志)
 [![Language](https://img.shields.io/badge/lang-简体中文-red)](#)
 [![skills.sh](https://img.shields.io/badge/install-npx%20skills%20add-black)](https://skills.sh)
@@ -15,7 +15,7 @@
 
 </div>
 
-面向中文创作者与小商家的 6 个 Agent Skills。每个技能都是一个遵循 [Agent Skills 开放规范](https://agentskills.io/specification) 的文件夹：带 YAML 头信息的 `SKILL.md`，加上按需加载的 `references/`、`assets/`、`scripts/` 和用于评测的 `evals/evals.json`。
+面向中文创作者与小商家的 8 个 Agent Skills。每个技能都是一个遵循 [Agent Skills 开放规范](https://agentskills.io/specification) 的文件夹：带 YAML 头信息的 `SKILL.md`，加上按需加载的 `references/`、`assets/`、`scripts/` 和用于评测的 `evals/evals.json`。
 
 与通用「写作提示词」的区别：
 - **平台硬规则内置**：小红书标题 ≤20 字、正文 ≤1000 字；公众号标题 ≤64 字、摘要 ≤120 字；X 中文按加权字符（汉字计 2）≤280——均已核对官方来源。
@@ -34,6 +34,7 @@
 | [`ai-ppt-cn`](./ai-ppt-cn/SKILL.md) | 中文 PPT：主线、结论式标题、每页讲稿，交付 Marp Markdown，可导出 PPTX/PDF | 每页 ≤3 要点、讲稿完整、页数匹配时长 |
 | [`x-thread-en2cn`](./x-thread-en2cn/SKILL.md) | 英文 X 热帖编译为中文帖（即刻/微博/X 中文串/小红书/公众号） | 出处完整、引用 ≤2 句、X 加权字数 |
 | [`short-drama-cn`](./short-drama-cn/SKILL.md) | AI 短剧/漫剧：创意→人物卡→分集大纲→分场剧本→分镜→即梦/可灵提示词 | 角色一致性、每集钩子、合规自检 |
+| [`humanize-cn`](./humanize-cn/SKILL.md) | 中文去 AI 味：识别套话、打散三段式、补具体细节，保留原意 | 套话词表、句式节奏、不伪造事实 |
 
 ## 目录结构
 
@@ -169,6 +170,7 @@ MIT，见仓库根目录 [LICENSE](../LICENSE)。可免费使用、修改、转�
 | `ai-ppt-cn` | Chinese slide decks as Marp Markdown with speaker notes, exportable to PPTX/PDF |
 | `x-thread-en2cn` | Adapt English X/Twitter threads into Chinese posts with attribution and X weighted-length checks |
 | `short-drama-cn` | Chinese AI short-drama/comic-drama writing: character cards, episode outline, scenes, shot list, video-model prompts, consistency and compliance checks |
+| `humanize-cn` | Rewrite Chinese AI-generated text to read human: remove stock phrases, vary rhythm, add concrete detail |
 
 **Install**
 
