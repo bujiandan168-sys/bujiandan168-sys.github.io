@@ -509,7 +509,7 @@
               var nm = str(f.name).trim().toLowerCase().replace(/[-_\s]+/g, "");
               var dn = d.toLowerCase().replace(/[-_\s.。，,:：!！]+/g, "");
               if (nm && (dn === nm || dn === nm + "skill" || dn === "a" + nm + "skill")) add(spec, "警告", "description 只是把名字抄了一遍", "没有说明做什么、何时用。写出具体场景和产出，例如「把会议录音整理成带待办的纪要。当用户要……时使用」。", dh);
-              var FL = /best practices|production[- ]ready|powerful|comprehensive|seamless|state[- ]of[- ]the[- ]art|一站式|全方位|最佳实践|开箱即用|强大的|赋能|极致|智能化/ig;
+              var FL = /best practices|production[- ]ready|powerful|comprehensive|seamless|state[- ]of[- ]the[- ]art|一站式|全方位|最佳实践|开箱即用|强大的|赋能|极致|智能化|打造闭环|深度融合|无缝衔接|高效便捷|助力/ig;
               var TP = /complete toolkit for|automated tool for|modern tools|all[- ]in[- ]one|toolkit for|streamline your|supercharge|leverage the power|全套工具|一键搞定一切/i;
               if (TP.test(d)) add(spec, "警告", "description 是模板化凑数句", "像「Complete toolkit for X with modern tools」这类句式放进任何 Skill 都成立，Agent 无法据此判断何时调用。改成具体动作+产出+用户原话。", dh);
               var fm = d.match(FL);
