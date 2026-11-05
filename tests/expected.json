@@ -289,5 +289,25 @@
   "findings": [
    "外部网址"
   ]
+ },
+ "synthetic/bad__hardcoded-key.md": {
+  "findings": [
+   "name 与文件夹名不一致",
+   "描述太短，Agent 可能不会触发",
+   "疑似硬编码密钥",
+   "触发语句太笼统，没有举用户的原话"
+  ]
+ },
+ "synthetic/bad__no-frontmatter.md": {
+  "findings": [
+   "缺少 YAML frontmatter"
+  ]
+ },
+ "synthetic/bad__rm-rf.md": {
+  "findings": [
+   "name 与文件夹名不一致",
+   "描述太短，Agent 可能不会触发",
+   "递归强制删除 rm -rf"
+  ]
  }
 }
