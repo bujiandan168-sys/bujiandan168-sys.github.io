@@ -7,7 +7,7 @@
 ## 样本构成
 | 目录 | 数量 | 说明 |
 |---|---|---|
-| samples/ | 42 | 公开仓库的真实 SKILL.md，原样复制，仅用于规则测试 |
+| samples/ | 43 | 公开仓库的真实 SKILL.md，原样复制，仅用于规则测试 |
 | synthetic/ | 9 | 故意写坏的样本（远程脚本、eval、提示注入、模板化描述等），防止修误报时把真问题放过 |
 | ../skills/ | 9 | 本仓库自家 Skill |
 | local/ | 13 | 不可再分发的样本（专有许可或未声明许可），只在本地跑，不提交（见 .gitignore） |
@@ -15,7 +15,7 @@
 ## 来源与许可
 | 前缀 | 来源 | 提交 | 许可 |
 |---|---|---|---|
-| anthropics__ | https://github.com/anthropics/skills （ca45fc4） | 14 个 Apache-2.0 的 Skill | Apache-2.0，见 samples/LICENSES/Apache-2.0-anthropics.txt |
+| anthropics__ | https://github.com/anthropics/skills （ca45fc4） | 15 个 Apache-2.0 的 Skill | Apache-2.0，见 samples/LICENSES/Apache-2.0-anthropics.txt |
 | mattpocock__ | https://github.com/mattpocock/skills （4ae2317） | 13 个 | MIT，见 samples/LICENSES/MIT-mattpocock.txt |
 | obra__ | https://github.com/obra/superpowers （22f0b46） | 15 个 | MIT，见 samples/LICENSES/MIT-obra.txt |
 | local/anthropics__ | anthropics/skills 的 docx、pdf、pptx、xlsx | 不提交 | 专有许可 |

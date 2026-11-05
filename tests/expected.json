@@ -309,5 +309,10 @@
    "描述太短，Agent 可能不会触发",
    "递归强制删除 rm -rf"
   ]
+ },
+ "samples/anthropics__doc-coauthoring.md": {
+  "findings": [
+   "外部网址"
+  ]
  }
 }
