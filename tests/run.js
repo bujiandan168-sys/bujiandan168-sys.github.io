@@ -15,9 +15,9 @@ catch (e) { console.log('SYNTAX/LOAD ERROR:', e.message); process.exit(1); }
 
 const cases = [];
 const add = (id, file, folder) => cases.push({ id, raw: fs.readFileSync(file, 'utf8'), folder });
-for (const f of fs.readdirSync(path.join(__dirname, 'samples')).sort())
+for (const f of fs.readdirSync(path.join(__dirname, 'samples')).filter(f => f.endsWith('.md')).sort())
   add('samples/' + f, path.join(__dirname, 'samples', f), f.replace(/^.*__/, '').replace(/\.md$/, ''));
-for (const f of fs.readdirSync(path.join(__dirname, 'synthetic')).sort())
+for (const f of fs.readdirSync(path.join(__dirname, 'synthetic')).filter(f => f.endsWith('.md')).sort())
   add('synthetic/' + f, path.join(__dirname, 'synthetic', f), f.replace(/^.*__/, '').replace(/\.md$/, ''));
 for (const d of fs.readdirSync(path.join(ROOT, 'skills')).sort()) {
   const p = path.join(ROOT, 'skills', d, 'SKILL.md');
