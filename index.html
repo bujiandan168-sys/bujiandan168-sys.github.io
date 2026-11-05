@@ -599,7 +599,7 @@
           var more = it.hits.length > 10 ? '<p class="x-more">另有 ' + (it.hits.length - 10) + " 处未列出</p>" : "";
           return '<li class="x-item"><div class="x-item__top"><span class="x-sev ' + sevClass(it.sev) + '">' + it.sev + "</span>" + esc(it.title) +
             '</div><p class="x-item__desc">' + esc(it.desc) + "</p>" + (hits ? '<ul class="x-hits">' + hits + "</ul>" : "") + more +
-            '<button class="btn x-fixbtn" type="button" data-fix="' + esc("【" + it.sev + "】" + it.title + "\n修复建议：" + it.desc) + '">复制修复建议</button></li>";
+            '<button class="btn x-fixbtn" type="button" data-fix="' + esc("【" + it.sev + "】" + it.title + "\n修复建议：" + it.desc) + '">复制修复建议</button></li>';
         }
         function groupHTML(title, list, okText) {
           return '<div><h3 class="x-group">' + title + ' <span class="pill">' + list.length + "</span></h3>" +
