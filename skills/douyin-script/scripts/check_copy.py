@@ -95,7 +95,8 @@ def main():
 
     full = "\n".join([args.title, args.digest, body])
     for term in ABSOLUTE_TERMS:
-        if term in full:
+        scan = re.sub(r"第一(?=[个条步点行句次章天名篇种招段部分])", "", full) if term == "第一" else full
+        if term in scan:
             warns.append(f"绝对化用语「{term}」：改写，或确认属于可证实的事实/自我比较")
     for term in MEDICAL_TERMS:
         if term in full:
