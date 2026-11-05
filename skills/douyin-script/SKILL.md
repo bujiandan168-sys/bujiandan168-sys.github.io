@@ -133,6 +133,7 @@ python3 scripts/check_copy.py --platform douyin --body-file <口播全文> --sec
 
 - [references/hooks-and-structures.md](references/hooks-and-structures.md)：选钩子、写带货/知识/门店主体结构、写 CTA 时读。
 - [references/example-laundry-45s.md](references/example-laundry-45s.md)：第一次写门店宣传类、想对齐完整交付格式时读。
+- [references/explainer-shortfilm.md](references/explainer-shortfilm.md)：写知识讲解/科普短片、需要风格词时读。
 - [assets/storyboard-template.md](assets/storyboard-template.md)：写分镜表时使用。
 - [references/ad-compliance-cn.md](references/ad-compliance-cn.md)：涉及推销、价格、功效、数据时读。
 
