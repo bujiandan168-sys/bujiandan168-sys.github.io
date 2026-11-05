@@ -5,6 +5,7 @@ description: >-
   当用户说「去 AI 味」「太像 ChatGPT 写的」「帮我润色得自然点」「公众号/小红书文案太机械」时使用。
   Use to rewrite Chinese AI-generated text so it reads human: remove stock phrases, vary rhythm, add concrete detail.
   不用于：伪造他人署名、规避学术检测、抄袭洗稿。
+license: MIT
 metadata:
   author: "<owner>"
   version: "1.0.0"
@@ -38,3 +39,7 @@ metadata:
 
 ## 自检
 改写后读一遍：有没有连续三句同样长？有没有一句话没有具体名词？有则再改。
+
+## 示例与测试
+- 完整输入/输出示例见 examples/。
+- 测试用例见 evals/evals.json。

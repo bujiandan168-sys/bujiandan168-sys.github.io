@@ -1,0 +1,293 @@
+{
+ "samples/anthropics__academy-guide.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "samples/anthropics__algorithmic-art.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "samples/anthropics__brand-guidelines.md": {
+  "findings": []
+ },
+ "samples/anthropics__canvas-design.md": {
+  "findings": []
+ },
+ "samples/anthropics__claude-api.md": {
+  "findings": [
+   "description 超过 1024 字符",
+   "外部网址",
+   "正文超过 500 行"
+  ]
+ },
+ "samples/anthropics__discernment-nudge.md": {
+  "findings": []
+ },
+ "samples/anthropics__frontend-design.md": {
+  "findings": []
+ },
+ "samples/anthropics__internal-comms.md": {
+  "findings": []
+ },
+ "samples/anthropics__mcp-builder.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "samples/anthropics__skill-creator.md": {
+  "findings": []
+ },
+ "samples/anthropics__slack-gif-creator.md": {
+  "findings": []
+ },
+ "samples/anthropics__theme-factory.md": {
+  "findings": [
+   "description 缺少触发语句"
+  ]
+ },
+ "samples/anthropics__web-artifacts-builder.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "samples/anthropics__webapp-testing.md": {
+  "findings": [
+   "description 缺少触发语句",
+   "外部网址"
+  ]
+ },
+ "samples/mattpocock__code-review.md": {
+  "findings": []
+ },
+ "samples/mattpocock__diagnosing-bugs.md": {
+  "findings": []
+ },
+ "samples/mattpocock__domain-modeling.md": {
+  "findings": []
+ },
+ "samples/mattpocock__git-guardrails-claude-code.md": {
+  "findings": []
+ },
+ "samples/mattpocock__grill-me.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__handoff.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__pr.md": {
+  "findings": [
+   "外部网址",
+   "描述太短，Agent 可能不会触发"
+  ]
+ },
+ "samples/mattpocock__setup-pre-commit.md": {
+  "findings": []
+ },
+ "samples/mattpocock__tdd.md": {
+  "findings": []
+ },
+ "samples/mattpocock__teach.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__to-spec.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__triage.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__writing-for-agents.md": {
+  "findings": []
+ },
+ "samples/obra__brainstorming.md": {
+  "findings": []
+ },
+ "samples/obra__diagnosing-superpowers.md": {
+  "findings": []
+ },
+ "samples/obra__dispatching-parallel-agents.md": {
+  "findings": []
+ },
+ "samples/obra__executing-plans.md": {
+  "findings": []
+ },
+ "samples/obra__finishing-a-development-branch.md": {
+  "findings": []
+ },
+ "samples/obra__receiving-code-review.md": {
+  "findings": []
+ },
+ "samples/obra__requesting-code-review.md": {
+  "findings": []
+ },
+ "samples/obra__subagent-driven-development.md": {
+  "findings": []
+ },
+ "samples/obra__systematic-debugging.md": {
+  "findings": []
+ },
+ "samples/obra__test-driven-development.md": {
+  "findings": []
+ },
+ "samples/obra__using-git-worktrees.md": {
+  "findings": []
+ },
+ "samples/obra__using-superpowers.md": {
+  "findings": []
+ },
+ "samples/obra__verification-before-completion.md": {
+  "findings": []
+ },
+ "samples/obra__writing-plans.md": {
+  "findings": []
+ },
+ "samples/obra__writing-skills.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "synthetic/bad__curl-pipe.md": {
+  "findings": [
+   "外部网址",
+   "管道执行远程脚本"
+  ]
+ },
+ "synthetic/bad__eval-code.md": {
+  "findings": [
+   "动态执行 eval"
+  ]
+ },
+ "synthetic/bad__fluff-cn.md": {
+  "findings": [
+   "description 有注水套话"
+  ]
+ },
+ "synthetic/bad__injection.md": {
+  "findings": [
+   "疑似提示注入",
+   "读取敏感路径"
+  ]
+ },
+ "synthetic/bad__name-upper.md": {
+  "findings": [
+   "name 与文件夹名不一致",
+   "name 含不允许的字符"
+  ]
+ },
+ "synthetic/bad__no-trigger-en.md": {
+  "findings": [
+   "description 缺少触发语句"
+  ]
+ },
+ "synthetic/bad__pdf-tool.md": {
+  "findings": [
+   "description 只是把名字抄了一遍",
+   "description 缺少触发语句",
+   "描述太短，Agent 可能不会触发"
+  ]
+ },
+ "synthetic/bad__template-desc.md": {
+  "findings": [
+   "description 是模板化凑数句"
+  ]
+ },
+ "synthetic/bad__vague-trigger-cn.md": {
+  "findings": [
+   "触发语句太笼统，没有举用户的原话"
+  ]
+ },
+ "skills/ai-ppt-cn": {
+  "findings": []
+ },
+ "skills/douyin-script": {
+  "findings": []
+ },
+ "skills/geo-cn": {
+  "findings": []
+ },
+ "skills/grill-me-cn": {
+  "findings": []
+ },
+ "skills/humanize-cn": {
+  "findings": []
+ },
+ "skills/short-drama-cn": {
+  "findings": []
+ },
+ "skills/wechat-article": {
+  "findings": []
+ },
+ "skills/x-thread-en2cn": {
+  "findings": []
+ },
+ "skills/xiaohongshu-viral": {
+  "findings": []
+ },
+ "local/anthropics__docx.md": {
+  "findings": []
+ },
+ "local/anthropics__pdf.md": {
+  "findings": []
+ },
+ "local/anthropics__pptx.md": {
+  "findings": []
+ },
+ "local/anthropics__xlsx.md": {
+  "findings": []
+ },
+ "local/vercel__composition-patterns.md": {
+  "findings": [
+   "name 与文件夹名不一致"
+  ]
+ },
+ "local/vercel__deploy-to-vercel.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "local/vercel__react-best-practices.md": {
+  "findings": [
+   "name 与文件夹名不一致"
+  ]
+ },
+ "local/vercel__react-native-skills.md": {
+  "findings": [
+   "name 与文件夹名不一致"
+  ]
+ },
+ "local/vercel__react-view-transitions.md": {
+  "findings": [
+   "name 与文件夹名不一致"
+  ]
+ },
+ "local/vercel__vercel-cli-with-tokens.md": {
+  "findings": [
+   "外部网址",
+   "读取敏感路径"
+  ]
+ },
+ "local/vercel__vercel-optimize.md": {
+  "findings": []
+ },
+ "local/vercel__web-design-guidelines.md": {
+  "findings": [
+   "外部网址"
+  ]
+ },
+ "local/vercel__writing-guidelines.md": {
+  "findings": [
+   "外部网址"
+  ]
+ }
+}
