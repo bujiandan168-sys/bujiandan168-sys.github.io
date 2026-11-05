@@ -187,3 +187,5 @@ cp -r skills/* .agents/skills/              # Codex, Cursor, Gemini CLI, Copilot
 Every skill ships offline, stdlib-only validation scripts and `evals/evals.json` test cases. All skills pass `skills-ref validate`. Platform limits were verified against official sources in Nov 2026; platform rules change, so double-check before publishing. Not legal advice.
 
 **Changelog**: v1.0.0 (2026-11-01) — spec-compliant rewrite, `skills/` layout, gotchas, scripts, evals.
+
+**New (2026-11-05)**: `grill-me-cn` — 动笔前先逐个追问，再交给写作类 skill。
