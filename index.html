@@ -436,27 +436,54 @@
             .replace(/(api[_-]?key\s*["']?\s*[:=]\s*["']?[A-Za-z0-9_.-]{4})[A-Za-z0-9_.-]{12,}/gi, "$1••••");
         }
 
+        /* 分级原则：「提示」= 正常 Skill 也常见、需要人工看一眼的写法（sudo、curl|sh 安装、.env）；
+           「中危/高危」= 带恶意意图特征的写法（外传、窃取凭证、篡改 Agent 权限、隐藏指令）。用 ATR 基准 dev 半区校准。 */
+        var PH = /your[_-]|xxx|\.\.\.|example|placeholder|changeme|process\.env|os\.environ|\$\{|<[^>]+>|abc123|here\b/i;
         var RULES = [
-          { sev: "高危", title: "管道执行远程脚本", desc: "下载后直接交给 shell 执行，脚本内容随时可被替换。先下载、看过再运行。",
+          { sev: "高危", title: "从可疑地址下载并执行", desc: "从粘贴站、短链、裸 IP 或加密压缩包获取程序并执行，是恶意 Skill 投放木马的典型手法。",
+            res: [/\b(curl|wget)\b[^\n]*(paste|rentry\.co|transfer\.sh|hastebin|glot\.io|ngrok|webhook\.site|requestbin|https?:\/\/\d{1,3}(\.\d{1,3}){3})[^\n]*\|\s*(sudo\s+)?(ba|z|da|k)?sh\b/i,
+                  /(rentry\.co|pastebin\.com|paste\.[a-z-]+\.[a-z]+|glot\.io|hastebin)[^\n]*(copy|run|paste|执行|复制)|(copy|run|执行|复制)[^\n]*(rentry\.co|pastebin\.com|glot\.io|hastebin)/i,
+                  /(extract|unzip|解压)[^\n]{0,60}(pass(word)?|密码)\s*[`'"：:]/i,
+                  /\b(curl|wget)\b[^\n]*\|\s*base64\s+(-d|--decode|-D)\b/i] },
+          { sev: "提示", title: "管道执行远程脚本", desc: "下载后直接交给 shell 执行，脚本内容随时可被替换。很多官方 CLI 也这样安装，确认域名是官方的再运行。",
             res: [/\b(curl|wget)\b[^\n|]*\|\s*(sudo\s+)?(ba|z|da|k)?sh\b/i, /\b(ba|z)?sh\s+<\(\s*(curl|wget)\b/i] },
-          { sev: "高危", title: "递归强制删除 rm -rf", desc: "路径写错或变量为空时可能删掉整个目录。确认删除范围。",
+          { sev: "高危", title: "反弹 shell", desc: "把本机终端交给远程主机控制。",
+            res: [/\/dev\/(tcp|udp)\/[\w.$-]+\/\d+/, /\b(nc|ncat|netcat)\b[^\n]*\s-(e|c)\s/, /\bbash\s+-i\b[^\n]*>&/, /\bmkfifo\b[^\n]*\b(nc|ncat|netcat)\b/, /\bsocat\b[^\n]*\bexec:/i,
+                  /pty\.spawn\(\s*["']\/bin\/(ba)?sh/] },
+          { sev: "高危", title: "命令输出被发往外部", desc: "把本机命令的输出（系统信息、环境变量、文件内容）作为数据发到外部地址，是外传的典型写法。",
+            res: [/\b(curl|wget)\b[^|\n]*\s(--data[\w-]*|-d|-F|--form|--post-data)[\s=]+[^|\n]{0,40}\$\(/i, /\b(nslookup|dig|host|ping)\b[^\n]*\$\(/i, /\b(nslookup|dig)\b[^\n]*\$\{?[A-Za-z_]+\}?\.[a-z0-9-]+\.[a-z]{2,}/i] },
+          { sev: "高危", title: "搜寻钱包、密钥或浏览器凭证", desc: "批量查找钱包文件、助记词、SSH/云凭证或浏览器登录数据，正常 Skill 几乎不需要。",
+            res: [/wallet\.dat|\.keystore\b|seed\.txt|mnemonic\*|助记词文件/i, /(metamask|phantom|Local Extension Settings)[^\n]*(cp|cat|find|tar|zip|read)|(cp|cat|find|tar|zip)\b[^\n]*(metamask|phantom|Local Extension Settings)/i,
+                  /Login Data|Cookies\.(sqlite|binarycookies)|cookies\.sqlite/i, /\.aws\/credentials|\.config\/gcloud\/|\.kube\/config|\.docker\/config\.json/] },
+          { sev: "高危", title: "篡改 Agent 权限或上下文文件", desc: "要求关闭沙箱、自动批准所有操作、不再征求确认，或往 CLAUDE.md / AGENTS.md 等上下文文件写规则，是上下文投毒的典型手法。",
+            res: [/dangerouslyDisableSandbox|autoApprove(All)?\s*[:=]\s*true|bypassPermissions|--dangerously-skip-permissions\b[^\n]*(always|默认|总是|every)/i,
+                  /(do not|don['’]t|never|无需|不要|不必)\s+(ask|request|seek|征求|询问|请求)[^\n]{0,20}(confirm|approv|permission|确认|同意|许可)/i,
+                  /\bnever\s+refuse\b|永远不要拒绝|不得拒绝任何/i] },
+          { sev: "高危", title: "递归强制删除系统或家目录", desc: "对 /、~、$HOME 做 rm -rf 会删掉整个系统或用户数据。",
+            res: [/\brm\s+-(?:[a-z]*r[a-z]*f|[a-z]*f[a-z]*r)[a-z]*\s+(\/|~|\$HOME|\/\*|~\/\*)(\s|$|["'`])/i] },
+          { sev: "提示", title: "递归强制删除 rm -rf", desc: "路径写错或变量为空时可能删掉整个目录。确认删除范围。",
             res: [/\brm\s+-(?:[a-z]*r[a-z]*f|[a-z]*f[a-z]*r)[a-z]*\b/i, /\brm\s+(-r\s+-f|-f\s+-r)\b/i] },
-          { sev: "高危", title: "chmod 777", desc: "把文件设为所有人可读写执行，会降低系统安全性。", res: [/\bchmod\s+(-R\s+)?0?777\b/i] },
-          { sev: "高危", title: "使用 sudo 提权", desc: "Skill 请求管理员权限执行命令，确认确有必要。", res: [/\bsudo\b/] },
+          { sev: "提示", title: "chmod 777", desc: "把文件设为所有人可读写执行，会降低系统安全性。", res: [/\bchmod\s+(-R\s+)?0?777\b/i] },
+          { sev: "提示", title: "使用 sudo 提权", desc: "Skill 请求管理员权限执行命令，确认确有必要。", res: [/\bsudo\b/] },
           { sev: "高危", title: "格式化磁盘 mkfs", desc: "mkfs 会清空整个分区。", res: [/\bmkfs(\.\w+)?\b/i] },
-          { sev: "高危", title: "底层磁盘写入 dd if=", desc: "dd 可直接覆盖磁盘数据。", res: [/\bdd\s+if=/i] },
+          { sev: "高危", title: "底层磁盘写入 dd if=", desc: "dd 可直接覆盖磁盘数据。", res: [/\bdd\s+if=[^\n]*of=\/dev\//i] },
           { sev: "高危", title: "base64 解码后执行", desc: "把编码内容解码后交给程序执行，常用于隐藏真实命令。解码看看内容。",
-            res: [/base64\s+(-d|--decode|-D)\b[^\n]*\|/i, /b64decode\([^\n]*\)[^\n]*(exec|eval)\s*\(/i] },
-          { sev: "高危", title: "动态执行 eval", desc: "eval 会执行任意字符串，确认传入的内容可信。", res: [/\beval\(/, /\beval\s+["'$`]/] },
-          { sev: "高危", title: "动态执行 exec", desc: "exec 会执行任意代码或命令，确认传入的内容可信。", res: [/\bexec\(/] },
-          { sev: "高危", title: "疑似硬编码密钥", desc: "文件里出现了像 API Key 或访问令牌的字符串。密钥不应写进 Skill，若是真实密钥请立即作废。", masked: true,
-            res: [/\bsk-[A-Za-z0-9_-]{20,}/, /AKIA[0-9A-Z]{16}/, /ghp_[A-Za-z0-9]{30,}/, /api[_-]?key\s*["']?\s*[:=]\s*["']?[A-Za-z0-9_.-]{16,}/i] },
+            res: [/base64\s+(-d|--decode|-D)\b[^\n]*\|\s*(sudo\s+)?(ba|z|da|k)?sh\b/i, /b64decode\([^\n]*\)[^\n]*(exec|eval)\s*\(|(exec|eval)\s*\([^\n]*b64decode/i, /eval\s*\(\s*atob\(|Function\s*\(\s*atob\(/] },
+          { sev: "提示", title: "动态执行 eval/exec", desc: "eval/exec 会执行任意字符串，确认传入的内容可信。", res: [/\beval\(/, /\beval\s+["'$`]/, /\bexec\(/] },
+          { sev: "高危", title: "疑似硬编码密钥", desc: "文件里出现了像真实 API Key 或访问令牌的字符串。密钥不应写进 Skill，若是真实密钥请立即作废。", masked: true,
+            res: [/\bsk-(?=[A-Za-z0-9_-]*\d)(?=[A-Za-z0-9_-]*[a-zA-Z])[A-Za-z0-9_-]{32,}/, /\bAKIA[0-9A-Z]{16}\b/, /\bghp_[A-Za-z0-9]{36}\b/, /\bxox[bpas]-[0-9]{8,}-[A-Za-z0-9-]{16,}/],
+            skip: PH },
           { sev: "高危", title: "疑似提示注入", desc: "要求 Agent 忽略原有指令或对用户隐瞒信息，这是典型的恶意写法。",
-            res: [/ignore\s+(all\s+)?(the\s+)?(previous|prior|above)\s+instructions/i, /忽略(之前|以上|上面|前面|先前|此前)/, /不要(告诉|告知)用户/, /do\s+not\s+tell\s+the\s+user|don['’]t\s+tell\s+the\s+user/i] },
-          { sev: "中危", title: "读取敏感路径", desc: "涉及 SSH 密钥、环境变量文件、系统账户或浏览器 Cookies，确认读取目的。",
-            res: [/~\/\.ssh|\.ssh\//, /(^|[^\w.])\.env\b/, /id_rsa/, /\/etc\/passwd/, /Cookies(\.sqlite|\.binarycookies)?\b|浏览器\s*Cookie/i] }
+            res: [/ignore\s+(all\s+)?(the\s+|your\s+|any\s+)?(previous|prior|above|earlier)\s+(instructions|rules|guidelines)/i, /忽略(之前|以上|上面|前面|先前|此前)的?(所有)?(指令|规则|设定|要求)/, /不要(告诉|告知|让)用户/, /(do\s+not|don['’]t|never)\s+(tell|inform|mention\s+(this|it)\s+to|reveal\s+(this|it)\s+to)\s+the\s+user/i],
+            skip: /^\s*\|/ },
+          { sev: "中危", title: "读取 SSH 私钥或系统账户文件", desc: "涉及 SSH 私钥或系统账户文件，确认读取目的。",
+            res: [/\b(cat|cp|scp|tar|zip|base64|curl|readFileSync|open|read|from|读取)\b[^\n]*(\.ssh\/(id_|\*)|\bid_(rsa|ed25519|ecdsa)\b(?!\.pub))/, /\/etc\/shadow\b|\bcat\s+\/etc\/passwd\b/] },
+          { sev: "提示", title: "涉及 .env 环境变量文件", desc: ".env 常存放密钥。正常配置说明也会提到它，确认 Skill 不会把内容发出去。", res: [/(^|[^\w.])\.env\b/] }
         ];
+        var EXFIL_SRC = /\.ssh\b|id_rsa|\.aws\/credentials|wallet\.dat|keystore|mnemonic|seed\.txt|\buname\s+-a\b|\bprintenv\b|\benv\s*\||Login Data|Cookies\.(sqlite|binarycookies)|glob\.sync\(\s*['"]\*\*|readFileSync\([^)]*\b(f|file|path)\b|cat\s+[^|\n]*\.env\b|\.env\b[^\n]*(read|cat|读取)/i;
+        var EXFIL_NET = /\b(curl|wget)\b[^\n]*(--data|-d\s|-F\s|--form|-T\s|--upload-file|-X\s*POST|@-)|requests\.post\(|fetch\([^)]*['"]https?:\/\/[^'"]+['"]\s*,\s*\{[\s\S]{0,40}method\s*:\s*['"]POST|method\s*:\s*['"]POST['"]|axios\.post\(|urllib\.request\.urlopen\([^)]*data=/i;
         var INVIS = /[\u200B-\u200F\u2060\uFEFF\u202A-\u202E\u2066-\u2069]/g;
+        var TAGS = /[\uDB40][\uDC00-\uDC7F]/g; /* U+E0000–E007F 标签字符（ASCII 走私） */
         var INVIS_NAME = { "200B": "零宽空格", "200C": "零宽非连接符", "200D": "零宽连接符", "200E": "从左到右标记", "200F": "从右到左标记", "2060": "单词连接符", "FEFF": "零宽不换行空格", "202A": "双向控制符", "202B": "双向控制符", "202C": "双向控制符", "202D": "双向控制符", "202E": "双向反转覆盖", "2066": "双向隔离符", "2067": "双向隔离符", "2068": "双向隔离符", "2069": "双向隔离符" };
         function hex(c) { return c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0"); }
 
@@ -540,16 +567,44 @@
           }
 
           /* security */
+          /* 隐藏的 base64 文本：解码后一起扫描 */
+          var dec = [], B64 = /[A-Za-z0-9+\/]{80,}={0,2}/g;
+          L.forEach(function (line, k) {
+            var mm; B64.lastIndex = 0;
+            while ((mm = B64.exec(line))) {
+              var t = "";
+              try { t = typeof atob === "function" ? atob(mm[0].slice(0, mm[0].length - mm[0].length % 4)) : ""; } catch (e) { t = ""; }
+              var printable = t && t.replace(/[\x20-\x7e\n\r\t]/g, "").length < t.length * 0.05;
+              if (printable && /[a-z]{3,}\s+[a-z]{2,}/i.test(t)) dec.push({ line: k + 1, text: t.replace(/\s+/g, " ") });
+            }
+          });
+          if (dec.length) add(sec, "中危", "藏着可读的 base64 文本", "这段编码解码后是一段文字，正常文档不需要把说明编码起来。已把解码内容一并纳入检查。（人工复核提示，不是定论）", dec.map(function (h) { return { line: h.line, text: "解码：" + snip(h.text) }; }));
+          var scanLines = L.map(function (line, k) { return { line: k + 1, text: line }; }).concat(dec);
           RULES.forEach(function (r) {
             var hits = [];
-            L.forEach(function (line, k) {
+            scanLines.forEach(function (o) {
+              var line = o.text;
+              if (r.skip && r.skip.test(line)) return;
               for (var i = 0; i < r.res.length; i++) {
                 var mm = r.res[i].exec(line);
-                if (mm) { hits.push({ line: k + 1, text: snip(mask(line), mm.index) }); break; }
+                if (mm) { hits.push({ line: o.line, text: snip(mask(line), mm.index) }); break; }
               }
             });
             if (hits.length) add(sec, r.sev, r.title, r.desc + "（人工复核提示，不是定论）", hits);
           });
+          /* 文件级组合：既读取敏感数据，又向外部发送 */
+          var allText = scanLines.map(function (o) { return o.text; }).join("\n");
+          var srcL = scanLines.filter(function (o) { return EXFIL_SRC.test(o.text); }), netL = scanLines.filter(function (o) { return EXFIL_NET.test(o.text) && !/localhost|127\.0\.0\.1/.test(o.text); });
+          if (srcL.length && (netL.length || /(send|post|upload|发送|上传)[^\n]{0,60}(to\s+)?https?:\/\//i.test(allText)))
+            add(sec, "高危", "读取敏感数据并发往外部", "同一个 Skill 里既读取凭证、源码或系统信息，又把数据 POST 到外部地址，符合数据外传特征。（人工复核提示，不是定论）", srcL.slice(0, 3).concat(netL.slice(0, 3)).map(function (o) { return { line: o.line, text: snip(mask(o.text)) }; }));
+          /* 斜杠命令数量异常（命令名抢注/挤占） */
+          var cmds = {}; (allText.match(/(^|[\s,(])\/[a-z][a-z0-9-]{2,}(?=[\s,)]|$)/gm) || []).forEach(function (c) { cmds[c.trim().replace(/^[,(]/, "")] = 1; });
+          if (Object.keys(cmds).length > 80) add(sec, "中危", "斜杠命令数量异常", "声明了 " + Object.keys(cmds).length + " 个斜杠命令，可能在抢注或挤占其他 Skill 的命令名。");
+          /* 仿冒包名：小写单词里夹着大写 I（看起来像 l） */
+          var tq = [];
+          L.forEach(function (line, k) { var mm = /\b(npm\s+(i|install)|pip3?\s+install|yarn\s+add|pnpm\s+add)\s+(-\S+\s+)*[@\w\/.-]*[a-z]I[a-z][\w.-]*|\b(from|require\()\s*['"][@\w\/.-]*[a-z]I[a-z][\w\/.-]*['"]/.exec(line); if (mm) tq.push({ line: k + 1, text: snip(line) }); });
+          var nmI = /[a-z]I[a-z]/.test(str(f && f.name));
+          if (tq.length || (nmI && /install/i.test(allText))) add(sec, "中危", "疑似仿冒包名", "包名里用大写 I 冒充小写 l 等形近字符，是供应链投毒常见手法。核对官方包名。", tq.length ? tq : nh || []);
 
           var ih = [];
           L.forEach(function (line, k) {
@@ -567,6 +622,15 @@
               ih.push({ line: k + 1, text: found.map(function (h) { return "U+" + h + " " + INVIS_NAME[h]; }).join("，") + "：" + snip(shown) });
             }
           });
+          var th = [];
+          L.forEach(function (line, k) {
+            var tags = line.match(TAGS);
+            if (tags && tags.length) {
+              var hidden = tags.map(function (c) { return String.fromCharCode(c.charCodeAt(1) - 0xDC00); }).join("").replace(/[\x00-\x1f\x7f]/g, "");
+              th.push({ line: k + 1, text: tags.length + " 个隐形标签字符，还原后：" + snip(hidden) });
+            }
+          });
+          if (th.length) add(sec, "高危", "隐形标签字符（ASCII 走私）", "Unicode 标签字符在屏幕上完全不显示，却能被模型读到，常用来藏指令。（人工复核提示，不是定论）", th);
           if (ih.length) add(sec, "中危", "不可见字符", "零宽字符和双向控制符肉眼看不见，可能藏着指令或让代码显示与实际不同。（人工复核提示，不是定论）", ih);
 
           var urls = [], seen = {};

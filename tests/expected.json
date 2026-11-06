@@ -165,7 +165,7 @@
  },
  "synthetic/bad__eval-code.md": {
   "findings": [
-   "动态执行 eval"
+   "动态执行 eval/exec"
   ]
  },
  "synthetic/bad__fluff-cn.md": {
@@ -176,7 +176,7 @@
  "synthetic/bad__injection.md": {
   "findings": [
    "疑似提示注入",
-   "读取敏感路径"
+   "读取 SSH 私钥或系统账户文件"
   ]
  },
  "synthetic/bad__name-upper.md": {
@@ -307,7 +307,8 @@
   "findings": [
    "name 与文件夹名不一致",
    "描述太短，Agent 可能不会触发",
-   "递归强制删除 rm -rf"
+   "递归强制删除 rm -rf",
+   "递归强制删除系统或家目录"
   ]
  },
  "samples/anthropics__doc-coauthoring.md": {
@@ -318,7 +319,7 @@
  "samples/mattpocock__ask-matt.md": {
   "findings": [
    "外部网址",
-   "读取敏感路径",
+   "涉及 .env 环境变量文件",
    "非标准字段"
   ]
  },
