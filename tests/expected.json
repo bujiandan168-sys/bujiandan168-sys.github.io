@@ -314,5 +314,39 @@
   "findings": [
    "外部网址"
   ]
+ },
+ "samples/mattpocock__ask-matt.md": {
+  "findings": [
+   "外部网址",
+   "读取敏感路径",
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__codebase-design.md": {
+  "findings": []
+ },
+ "samples/mattpocock__grilling.md": {
+  "findings": []
+ },
+ "samples/mattpocock__implement.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__research.md": {
+  "findings": []
+ },
+ "samples/mattpocock__retro.md": {
+  "findings": [
+   "非标准字段"
+  ]
+ },
+ "samples/mattpocock__scaffold-exercises.md": {
+  "findings": []
+ },
+ "samples/mattpocock__wayfinder.md": {
+  "findings": [
+   "非标准字段"
+  ]
  }
 }
