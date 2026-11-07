@@ -721,10 +721,11 @@
           ta.select();
           try { ta.setSelectionRange(0, ta.value.length); } catch (e) {}
           var ok = false;
+          var btn = document.getElementById(ta.id === "g-out" ? "g-copy" : "c-copy"); var flash = function () { if (!btn) return; var o = btn.getAttribute("data-o") || btn.textContent; btn.setAttribute("data-o", o); btn.textContent = "已复制 ✓"; setTimeout(function () { btn.textContent = o; }, 1500); };
           try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
-          if (ok) { msgEl.textContent = "已复制到剪贴板。"; return; }
+          if (ok) { msgEl.textContent = "已复制到剪贴板。"; flash(); return; }
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(ta.value).then(function () { msgEl.textContent = "已复制到剪贴板。"; }, function () { ta.select(); msgEl.textContent = fallback; });
+            navigator.clipboard.writeText(ta.value).then(function () { msgEl.textContent = "已复制到剪贴板。"; flash(); }, function () { ta.select(); msgEl.textContent = fallback; });
           } else msgEl.textContent = fallback;
         }
 
